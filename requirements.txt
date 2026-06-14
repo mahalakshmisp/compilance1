@@ -1,4 +1,5 @@
 Flask>=2.3.0
+gunicorn>=20.1.0
 google-generativeai>=0.8.6
 # Optional: newer client. Install if you plan to migrate to the newer package
 # pip install google-genai
