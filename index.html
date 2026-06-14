@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>AI - Live Auditor</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f4f7f6; padding: 20px; }
+        .header { background: #002b5e; color: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); max-width: 600px; margin: auto; }
+        textarea { width: 100%; height: 100px; margin-top: 10px; padding: 10px; font-family: monospace; border: 1px solid #ccc; box-sizing: border-box; }
+        button { background: #28a745; color: white; border: none; padding: 10px 20px; font-size: 16px; cursor: pointer; width: 100%; margin-top: 15px; border-radius: 5px;}
+        button:disabled { background: #6c757d; }
+        .result { margin-top: 20px; padding: 15px; border-radius: 5px; display: none; }
+        .compliant { background: #d4edda; border-left: 5px solid #28a745; }
+        .non-compliant { background: #f8d7da; border-left: 5px solid #dc3545; }
+    </style>
+</head>
+<body>
+
+    <div class="header" style="max-width: 600px; margin: 0 auto 20px auto;">
+        <h2 style="margin: 0;">AI - Live Auditor</h2>
+        <div>Live ISO 27001 Auditor Prototype</div>
+    </div>
+
+    <div class="card">
+        <h3>Control A.9.2.1: User Offboarding</h3>
+        <p style="font-size: 14px; color: #555;">Paste log data or evidence below to test the live AI model.</p>
+        
+        <textarea id="evidenceInput">
+Employee Name: John Doe
+Date: 2026-06-14
+Action: Active Directory disabled. Physical badge revoked.
+        </textarea>
+        
+        <button id="runBtn" onclick="runAudit()">Run Live AI Audit</button>
+        
+        <div id="resultBox" class="result">
+            <strong id="statusText"></strong>
+            <p id="reasonText" style="margin: 5px 0 0 0;"></p>
+        </div>
+    </div>
+
+    <script>
+        async function runAudit() {
+            const btn = document.getElementById('runBtn');
+            const resultBox = document.getElementById('resultBox');
+            const evidence = document.getElementById('evidenceInput').value;
+            
+            btn.disabled = true;
+            btn.innerText = "Analyzing Live Data...";
+            resultBox.style.display = "none";
+
+            try {
+                const response = await fetch('/api/audit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ evidence: evidence })
+                });
+                
+                const data = await response.json();
+                
+                resultBox.style.display = "block";
+                resultBox.className = "result " + (data.status === "Compliant" ? "compliant" : "non-compliant");
+                document.getElementById('statusText').innerText = "AI Decision: " + data.status;
+                document.getElementById('reasonText').innerText = data.reason;
+                
+            } catch (error) {
+                alert("Error connecting to AI Server.");
+            }
+            
+            btn.disabled = false;
+            btn.innerText = "Run Live AI Audit";
+        }
+    </script>
+</body>
+</html>
